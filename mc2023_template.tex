@@ -40,33 +40,29 @@
 \captionsetup{width=1.0\textwidth,font={bf,normalsize},skip=0.3cm,within=none,justification=centering}
 
 %\usepackage[justification=centering]{caption}
+\usepackage[acronym,toc]{glossaries}
 
 %
 % Define title...
 %
-\title{Title of the Paper/Extended Abstract: Centered, Title Case, 14 Point Times \\
-  New Roman, on Second Line from the Top Margin,\\ Not
-  More Than Three Lines Long}
+\title{Implementation and Validation of OpenMC \\
+in a Salt Reprocessing Simulator for Molten Salt Reactors}
 %
 % ...and authors
 %
 \author{%
   % FIRST AUTHORS 
   %
-  \textbf{A.~Author$^1$, B.~Otherauthor$^2$, and C.~Lastauthor$^3$}\footnote{Footnote, if necessary, in Times New Roman font and font size 10}\vspace{3pt} \\
-  $^1$Name of Institution 1  \\
+  \textbf{O.~Yardas$^1$}\vspace{3pt} \\
+  $^1$University of Illinois Urbana-Champaign 1  \\
   Corresponding Address \vspace{6pt}\\ 
-  $^2$Name of Institution 2  \\ 
-    Corresponding Address\vspace{6pt} \\ 
-  $^3$Name of Institution 3  \\
-     Corresponding Address\vspace{6pt} \\
-  \url{AuthorA@email}, \url{AuthorB@email}, \url{AuthorC@email}
+  \url{oyardas2@illinois.edu}
 }
 %
 % Insert authors' names and short version of title in lines below
 %
-\newcommand{\authorHead}{Authors' names, use et al.~if more than three}
-\newcommand{\shortTitle}{Short One Line Paper Title}
+\newcommand{\authorHead}{O. Yardas}
+\newcommand{\shortTitle}{OpenMC salt reprocessing simulator}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -74,20 +70,34 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\include{acros}
 \maketitle
 \justify 
 \parskip 6pt plus 1 pt minus 1 pt
 
 \begin{abstract}
-  Use 8.5"$\times$11" paper size (US letter), with 1'' margins on all sides.  A required 200-250 
-  word abstract starts on this line.  Leave two blank lines before ``ABSTRACT''
-  and one after.  Use 11 point Times New Roman here and single (11 point) 
-  spacing. The abstract is a very brief summary highlighting main 
-  accomplishments, what is new, and how it relates to the state-of-the-art.
-Both the {\it extended abstract} (2-4 pages, to be submitted for review) and the {\it full paper} (10 pages max, to be submitted for the proceedings) must include this abstract.  
+  Anthropogenic \Gls{ghg} emissions drive global warming. Rapid decrease in
+  global \Gls{ghg} emissions can can dampen the impact of global warming.
+  Transitioning to electricity production methods that have no \Gls{ghg}
+  emissions would contribute significantly to global \Gls{ghg} emission
+  reduction. Like their contemporary counterparts, next generation nuclear
+  reactors will produce no \Gls{ghg} emissions, while being safer and more
+  efficient. \Gls{msr} technology is of particular interest due to the
+  opportunities and challenges it presents. No operating \Gls{msr}s exist, so we
+  must rely on computer simulations to study this technology. Popular \Gls{msr}
+  designs to use in simulations include the \Gls{msbr}, the \Gls{msre}, and the
+  \Gls{msfr}. A key process to consider for \Gls{msr}s is on-line fuel
+  reprocessing and its effect on reactor dynamics. SaltProc is an open source
+  interface code tool that simulates on-line fuel reprocessing when coupled with
+  a depletion-capable transport solver. SaltProc was intended to be usable with
+  any depletion solver, but only had support for Serpent2. I overhauled the
+  SaltProc code to simplify coupling supports for depletion solvers, and added
+  support for OpenMC. I also validated the new functionality on a full-core model
+  of the \Gls{msbr}. This is significant as this makes SaltProc the first
+  completely open-source tool to simulate on-line fuel reprocessing.
 \end{abstract}
 \vspace{6pt}
-\keywords{list of three to five key words}
+\keywords{MSR, reprocessing, OpenMC}
 
 \section{INTRODUCTION} 
 The full paper as well as the extended abstract start here with two blank lines before first section title.  Use 
