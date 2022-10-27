@@ -42,6 +42,25 @@
 %\usepackage[justification=centering]{caption}
 \usepackage[acronym,toc]{glossaries}
 
+\usepackage{xspace}
+
+\newcommand{\Cycamore}{\textsc{Cycamore}\xspace}
+\newcommand{\Cyclus}{\textsc{Cyclus}\xspace}
+\newcommand{\SaltProc}{\textsc{SaltProc}\xspace}
+\newcommand{\OpenMC}{\textsc{OpenMC}\xspace}
+\newcommand{\SerpentTWO}{\textsc{Serpent2}\xspace}
+\newcommand{\ONIX}{\textsc{ONIX}\xspace}
+\newcommand{\NJOYTWOONE}{\textsc{NJOY21}\xspace}
+\newcommand{\ChemTriton}{\textsc{ChemTriton}\xspace}
+\newcommand{\Shift}{\textsc{Shift}\xspace}
+\newcommand{\SCALE}{\textsc{SCALE}\xspace}
+\newcommand{\TRITON}{\textsc{TRITON}\xspace}
+\newcommand{\ORIGEN}{\textsc{ORIGEN}\xspace}
+\newcommand{\MCNPSIX}{\textsc{MCNP6}\xspace}
+\newcommand{\CINDERNINETY}{\textsc{CINDER90}\xspace}
+\newcommand{\ADDER}{\textsc{ADDER}\xspace}
+
+
 %
 % Define title...
 %
@@ -100,117 +119,173 @@ in a Salt Reprocessing Simulator for Molten Salt Reactors}
 \keywords{MSR, reprocessing, OpenMC}
 
 \section{INTRODUCTION} 
-The full paper as well as the extended abstract start here with two blank lines before first section title.  Use 
-8.5"$\times$11" paper size (US letter), with 1'' margins on all sides.  Use one blank line 
-before and after each subsequent section's title.  Most of the formatting is globally
-set by the specifications given in the \texttt{mc2023.cls} file.  
-First-level section titles must be all uppercase and centered, and must 
-be numbered in Arabic numerals as shown above.  Unlike the Word template, the body
-text and section titles for this \LaTeX\ template use 
-11-point font.  We have found that the 11-point font in \LaTeX\ more closely 
-matched the 12-point font in Word.  Introduce the topic of the work 
-in this section.
+Nuclear power currently constitutes one fifth of US domestic electricity
+production and half of US zero-carbon electricity production
+\cite{eia_faq_2021} \cite{doene_facts_2021}. Unfortunately, our current nuclear
+fleet faces several threats to its long-term survival, the most relevant being
+the state of the electricity market: record-low natural gas prices and
+increases in subsidies for renewables without similar compensation for
+nuclear make it uncompetitive in the current market and economically unsustainable in the
+long term if current conditions continue\footnote{This is a generalization as
+the economics of electricity markets is incredibly complex and requires more space that I can give to it
+in this abstract to fully appreciate} \cite{szilard_economic_2016}.
+%perhaps mention all plants that have been shut down recently?
 
-The first line of a paragraph is not indented; rather add 6 pt spacing between 
-paragraphs.  This is done automatically in the \LaTeX\ template.
+Assuming that we resolve the economic threats to our current nuclear fleet,
+at some point in the future, we will need to shut down and decommission them.
+To maintain nuclear power's position in our decarbonization technology stack, we
+will need to develop and implement new kinds of nuclear reactors that are more
+sustainable, economically competitive, safe, and reliable than their
+predecessors.
+%% I want to make this point differently... the conclusion should be that we need new nuclear power tech to ensure we can decarbonize, but I don't feel like the preceding statements smoothly come to that conclusion in the way I have preseneted them here
+ 
+\subsection{Molten Salt Reactors}%
+\label{sec:molten_salt_reactors}
+The next generation of nuclear power reactors will need to rapidly respond to
+increasing electricity consumption and the need for decarbonization. These
+reactiors need to be built quickly and have widespread use, while maintaining or
+increasing fuel efficiency, economic competitiveness, safety, and proliferation
+resistance.
 
-There are four types of reference styles: journal paper~\cite{journal}, 
-proceedings paper~\cite{proc_paper}, book~\cite{book}, and website~\cite{website}.
-References to websites are discouraged. It 
-is the author's responsibility to check links in the PDF file of the paper. 
-All references should be cited in the text in numerical order, in order of 
-appearance as [5-7].
+This is the conclusion that the \Gls{gif} came to in their 2002
+roadmap \cite{doe-ne_technology_2002}. \Gls{gif} selected six reactor
+technologies in total. One of them, the \Gls{msr},\footnote{for
+this paper {\it Molten Salt Reactor} refers specifically to the reactor type
+where the fissile material is dissolved in in the salt coolant} is of
+particular interest due to the unique challenges and opportunities it presents
+for new nuclear fuel cycles, proliferation safeguards, and multiphysics
+modeling.
+%% why the msr??
 
-Submission of papers is done in two stages: i) an {\it extended abstract} of length between two and four pages is submitted by the deadline of November 1, 2022 for review; ii) upon acceptance, a {\it full paper} of maximum length of 10 pages is submitted by May 9th, 2023 for inclusion in the proceedings.    
-Papers longer than 10 pages
-will be billed at \$100/page in excess of 10 pages.  It is strongly recommended
-that the length of any final paper should not exceed 12 pages.
+The \Gls{msr} uses a mixture of liquid-phase salts as a coolant and solvent for
+the fuel. Liquid fuel enables the adoption of {\it online reprocessing} by
+pumping used fuel out of the reactor and pumping fresh or reprocessed fuel back
+into the reactor.\footnote{this concept is known as {\it separations and feeds}}
+This enables the removal of undesirable fission products produced by the fission
+reaction. In contrast, the fission
+products remain trapped in solid fuel used in contemporary rectors, which can
+reduce the thermal performance of the fuel via thermal cracking as well as
+absorb neutrons that would otherwise contribute to the fission reaction. 
 
-\section{SECOND OR SUBSEQUENT MAJOR HEADING} 
-\label{sec:first}
+%\Gls{msr}s face several technical and logistical challenges before we can
+%deploy them for civilian power generation. High temperature liquid-phase salt
+%will steadily corrode metals over time, so the reactor vessel of a \Gls{msr}
+%must use special corrosion-resistant materials. High temperature salt itself is
+%extremely hazardous and reacts explosively with moisture, so workers handling
+%fuel salt must use special procedures and PPE. Remote handling of fuel salt may
+%be necessary in some or all instances. Even with such challenges, I believe the
+%potential benefits of \Gls{msr} technology merit its development.
 
-This is Section~\ref{sec:first}. It is followed by a subsection, that is, 
-\ref{sec:second}. The style for subsection titles and all text in this template is defined 
-in the \texttt{mc2023.cls} file.  Make sure to avoid widow/orphan lines.
+\Gls{mns} codes will play a critical role in licensing GenIV reactors. In
+preparation for \Gls{msr}s, both the \Gls{doene} and the \Gls{nrc}
+identified several technical gaps in current \Gls{mns} tools that are necessary
+for efficient and effective license application reviews
+\cite{betzler_modeling_2019} \cite{usnrc_nonlwr_2020-1}. In particular, both the
+\Gls{doene} and the \Gls{nrc} have identified fuel composition and its
+evolution in a \Gls{msr} to be key modeling features necessary for accident
+analysis. 
 
-\subsection{Subsection Title: First Character of Each Non-trivial Word is Uppercase} 
-\label{sec:second}
+\subsection{\Gls{msr} Depletion Codes}%
+\label{sec:msr_codes}
 
-Double-space before and after secondary titles is automatic.  Figures and 
-tables should appear as close as possible to where they are first
-cited, e.g., Fig.~\ref{fig:mcd}, in the text.  Figures are numbered in Arabic 
-numerals, with the caption centered below the figure, in \textbf{boldface}. 
-Triple-space before the figure, and after the figure caption.\\
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[scale=0.46]{CNBHeatMap.jpg}
-  \caption{Multiphysics Heatmap of the Canadian Thermal Battery\textsuperscript{\texttrademark}. }
-  \label{fig:mcd}
-\end{figure}
-
-When importing figures or any graphical image please verify two things:
-\begin{enumerate} 
-\item Any number, text or symbol is in Times font and is not smaller than 
-  10-point after reduction to the actual window in the paper,
-\item That it can be translated into PDF.
+To model the changing fuel composition in a \Gls{msr}, there are at least two
+processes we must consider:
+\begin{enumerate}
+    \item Fuel {\it depletion}\footnote{the consumption of fissile material in the fuel and production of fission products via the fission chain reaction}
+    \item Removal and feed processes
 \end{enumerate}
 
-Numbers up to ten should be spelled out. Numbers of 11 and higher are numerals.
+We can concisely describte the rate of change of the number density of $n$ nuclides with the equation:
+\begin{align}
+    \label{eq:bateman-1}
+    \frac{d}{dt}N(t) = \mathbf{A}N(t)
+\end{align}
 
-Equations, such as Eq. (\ref{sample_equation}), should be centered and 
-sequentially numbered to the flush right of the formula.
+where $N$ is a $n$-vector and $\mathbf{A}$ is the depletion matrix\footnote{this
+matrix contains all the coefficient terms in the Bateman equation}.
+Incorporating removals and feeds into equation \ref{eq:bateman-1} involves
+the addition of a time dependent removal factor $r_{i}(t)$ and feed factor
+$f_{i}(t)$ for each nuclide $i$, which in matrix form we express as:
+\begin{align}
+    \label{eq:bateman-1}
+    \frac{d}{dt}N(t) = \mathbf{A}N(t) + S(t)
+\end{align}
 
-\begin{equation}
-  \label{sample_equation}
-  \mathrm{Speedup}=\frac{1}{\frac{f}{p}+(1-f)},
-\end{equation}
-where $f$ and $p$ are some variables that need to be explained here.  Note that the equation has a punctuation mark, and the continuation of a paragraph after an equation should not be indented.  
-All paragraphs, as well as section or subsection headings, are separated by a 6~pt spacing.
+where $S$ is an $n$-vector containing the sums of the removal and feed terms
+for each nuclide $i$. This equation describes {\it continuous reprocessing}.
+The additional term in equation from continuous reprocessing increases
+computational cost and implementation difficulty and may require a different set
+of preconditioners for numerical stability and convergence.
 
-\subsubsection{Sub-subsection level and lower: only first character uppercase}
+Alternatively, one could run a depletion simulation, perform the removals and
+feeds in an external application on the resulting material composition, and run
+another depletion simulation on the reprocessed composition. This procedure
+models {\it batch-wise reprocessing}, in which material from the core is
+reprocessed at regular intervals rather than continuously. Batch-wise
+reprocessing enables flexibility in the choice of depletion solver, as an
+external software tool can perform the reprocessing step and feed the results
+back into the depletion solver.
 
-See Table \ref{table:example} for a sample table.  The ``tabls'' package is
-recommended for improved row and column spacing.  Notice the caption appears 
-above the table by setting the \verb!\caption! command immediately 
-after the \verb!\begin{table}!. Tables are numbered in Roman 
-numerals, with the caption centered above the table, in \textbf{boldface}.  
-Triple-space before and after the table.
+\SaltProc\cite{rykhlevskii_saltproc_2018}, the focus of this paper, uses a
+batch-wise reprocessing approach to model the fuel composition in a \Gls{msr}
+and uses \SerpentTWO\cite{leppanen_serpent_2014} to run depletion simulations.
+\SaltProc is unique among its peers as an open source project.
 
-\begin{table}[!htb]
-  \centering
-  \caption{\bf Parallel Performance for the Sample Problem.}
-  \label{table:example} 
-  \begin{tabular}{|c|c|c|c|} \hline 
-   Number of & Wall-Clock & Speedup & Efficiency \\
-   Processors & Time (min)$^a$& (T$_{s}$/T$_{p}$) & (\%) \\ \hline
-    \ 1 &  100.0 & \ ---    & ---  \\ \hline
-    \ 2 &   52.6 & \ 1.9    & 95.0 \\ \hline 
-  \end{tabular}
-\end{table}
+%Historically, software used in licensing, \gls{rnd}, and \gls{ent} efforts in
+%the nuclear field have been closed source and proprietary. For \Gls{rnd} and
+%\Gls{ent} efforts in particular, the liscening process can bring collaborative
+%efforts to a grinding halt. Using \gls{cc}s in scientific publications and
+%research presents barriers to reproducibility and the ability of external
+%verification of results.
+    
+%Regulatory bodies will require new software features (and, in some cases, entirely
+%new software tools) to effectively and efficiently perform licensing
+%activities for the next generation of advanced reactor designs
+%\cite{usnrc_nonlwr_2020-1}, and many of the open source tools emerging in the
+%past decade (e.g., \OpenMC\cite{romano_openmc_2015}) have the advantage over
+%their legacy \Gls{cc} ancestors (e.g., \SerpentTWO \cite{leppanen_serpent_2014})
+%of using best-practices for software development. Thus, the features
+%and tools required may be more readily implementable and usable in open source projects than
+%in closed codes.
+
+We are entering the era of \gls{oss} purpose-built for nuclear
+science and engineering applications. The number of open source projects in this
+field
+(\ONIX\cite{de_troullioud_de_lanversin_onix_2021}, \OpenMC,
+\NJOYTWOONE\cite{noauthor_njoy21_2022}, \Cyclus\cite{noauthor_cyclus_2022}, to
+name a few) is growing in recognition of the need for distributable,
+high-quality, and transparent software tools. The \Gls{iaea} facilitated
+\Gls{oncore} initiative \cite{fiorina_initiative_2021} is the best
+example of the push towards \Gls{oss}, as seen in the mission statement: to
+``[promote] development and application of open-source multi-physics simulation
+tools to support research, education, and training for analysis of advanced
+nuclear power reactors'' \cite{iaea_open-source_2022}. 
+
+I am working on implenting support for OpenMC's depletion solver in SaltProc,
+and will verify my implementation on a model of the MSBR.
+
+\section{MOLTEN SALT REACTOR MODEL}
+\label{sec:msr-model}
+
 
 \section{CONCLUSIONS}
 
 Present the summary and conclusions here.
 
-\section*{NOMENCLATURE}
-
-If variables are extensively used in the text, a Nomenclature section would be helpful to the readers.
+%\section*{NOMENCLATURE}
+%
+%If variables are extensively used in the text, a Nomenclature section would be helpful to the readers.
 
 \section*{ACKNOWLEDGEMENTS}
-
-Acknowledge the help of colleagues and sources of funding, as appropriate.
-
-\textbf{As an example:} The format for this template was adapted from the \LaTeX\ template for the M\&C 2021
-conference, incorporating limited elements from the M\&C 2019 template.  The M\&C 2023 organizing committee
-thanks the M\&C 2021 and M\&C 2019 technical committees for this support.
+I would like to acklowledge Dr. Madicken Munk for her review of this manuscript.
+This work was funded by the NRC Integrated University Grant Program Fellowship.
 
 % You can enter a bibliography into the document using either BibTex with the bibliography
 % style file "mc2023.bst" found in the template directory or using the standard LaTeX
 % thebibliography environment.
 \newif\ifusebibtex
-\usebibtexfalse
-%\usebibtextrue
+%\usebibtexfalse
+\usebibtextrue
 
 \ifusebibtex
 \setlength{\baselineskip}{12pt}
@@ -231,11 +306,11 @@ thanks the M\&C 2021 and M\&C 2019 technical committees for this support.
 \end{thebibliography}
 \fi
 
-\appendix
-\gdef\thesection{APPENDIX~\Alph{section}}
-\section{Sample Appendix 1}
-\label{app:a}
-If necessary, include Appendices numbered in upper case alphabetical order. This is \ref{app:a}. 
+%\appendix
+%\gdef\thesection{APPENDIX~\Alph{section}}
+%\section{Sample Appendix 1}
+%\label{app:a}
+%If necessary, include Appendices numbered in upper case alphabetical order. This is \ref{app:a}. 
 
 
 
