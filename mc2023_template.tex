@@ -43,6 +43,8 @@
 \usepackage[acronym,toc]{glossaries}
 
 \usepackage{xspace}
+\usepackage{tabulary}
+\usepackage{subfig}
 
 \newcommand{\Cycamore}{\textsc{Cycamore}\xspace}
 \newcommand{\Cyclus}{\textsc{Cyclus}\xspace}
@@ -95,11 +97,12 @@ in a Salt Reprocessing Simulator for Molten Salt Reactors}
 \parskip 6pt plus 1 pt minus 1 pt
 
 \begin{abstract}
-  Anthropogenic \Gls{ghg} emissions drive global warming. Rapid decrease in
-  global \Gls{ghg} emissions can can dampen the impact of global warming.
-  Transitioning to electricity production methods that have no \Gls{ghg}
-  emissions would contribute significantly to global \Gls{ghg} emission
-  reduction. Like their contemporary counterparts, next generation nuclear
+%  Anthropogenic \Gls{ghg} emissions drive global warming. Rapid decrease in
+%  global \Gls{ghg} emissions can can dampen the impact of global warming.
+%  Transitioning to electricity production methods that have no \Gls{ghg}
+%  emissions would contribute significantly to global \Gls{ghg} emission
+%  reduction.
+  Like their contemporary counterparts, next generation nuclear
   reactors will produce no \Gls{ghg} emissions, while being safer and more
   efficient. \Gls{msr} technology is of particular interest due to the
   opportunities and challenges it presents. No operating \Gls{msr}s exist, so we
@@ -119,28 +122,28 @@ in a Salt Reprocessing Simulator for Molten Salt Reactors}
 \keywords{MSR, reprocessing, OpenMC}
 
 \section{INTRODUCTION} 
-Nuclear power currently constitutes one fifth of US domestic electricity
-production and half of US zero-carbon electricity production
-\cite{eia_faq_2021} \cite{doene_facts_2021}. Unfortunately, our current nuclear
-fleet faces several threats to its long-term survival, the most relevant being
-the state of the electricity market: record-low natural gas prices and
-increases in subsidies for renewables without similar compensation for
-nuclear make it uncompetitive in the current market and economically unsustainable in the
-long term if current conditions continue\footnote{This is a generalization as
-the economics of electricity markets is incredibly complex and requires more space that I can give to it
-in this abstract to fully appreciate} \cite{szilard_economic_2016}.
-%perhaps mention all plants that have been shut down recently?
+%Nuclear power currently constitutes one fifth of US domestic electricity
+%production and half of US zero-carbon electricity production
+%\cite{eia_faq_2021} \cite{doene_facts_2021}. Unfortunately, our current nuclear
+%fleet faces several threats to its long-term survival, the most relevant being
+%the state of the electricity market: record-low natural gas prices and
+%increases in subsidies for renewables without similar compensation for
+%nuclear make it uncompetitive in the current market and economically unsustainable in the
+%long term if current conditions continue\footnote{This is a generalization as
+%the economics of electricity markets is incredibly complex and requires more space that I can give to it
+%in this abstract to fully appreciate} \cite{szilard_economic_2016}.
+%%perhaps mention all plants that have been shut down recently?
 
-Assuming that we resolve the economic threats to our current nuclear fleet,
-at some point in the future, we will need to shut down and decommission them.
-To maintain nuclear power's position in our decarbonization technology stack, we
-will need to develop and implement new kinds of nuclear reactors that are more
-sustainable, economically competitive, safe, and reliable than their
-predecessors.
+%Assuming that we resolve the economic threats to our current nuclear fleet,
+%at some point in the future, we will need to shut down and decommission them.
+%To maintain nuclear power's position in our decarbonization technology stack, we
+%will need to develop and implement new kinds of nuclear reactors that are more
+%sustainable, economically competitive, safe, and reliable than their
+%predecessors.
 %% I want to make this point differently... the conclusion should be that we need new nuclear power tech to ensure we can decarbonize, but I don't feel like the preceding statements smoothly come to that conclusion in the way I have preseneted them here
  
-\subsection{Molten Salt Reactors}%
-\label{sec:molten_salt_reactors}
+%\subsection{Molten Salt Reactors}%
+%\label{sec:molten_salt_reactors}
 The next generation of nuclear power reactors will need to rapidly respond to
 increasing electricity consumption and the need for decarbonization. These
 reactiors need to be built quickly and have widespread use, while maintaining or
@@ -226,10 +229,33 @@ reprocessing enables flexibility in the choice of depletion solver, as an
 external software tool can perform the reprocessing step and feed the results
 back into the depletion solver.
 
-\SaltProc\cite{rykhlevskii_saltproc_2018}, the focus of this paper, uses a
-batch-wise reprocessing approach to model the fuel composition in a \Gls{msr}
-and uses \SerpentTWO\cite{leppanen_serpent_2014} to run depletion simulations.
-\SaltProc is unique among its peers as an open source project.
+\begin{table}[htpb]
+    \centering
+    \caption{Software tools that can model \Gls{msr} depletion with fuel reprocessing}
+    \label{tab:msr_depletion_tools}
+    \begin{tabulary}{\linewidth}{|C|C|C|C|}
+        \hline
+        Software tool & Description & Reprocessing scheme & Citation\\
+        \hline
+        \ADDER & Interface code with internal depletion capabilities & Component-based continuous & \cite{nelson_molten_2021}\\
+        \hline
+        \SCALE & Suite code & Continuous & \cite{betzler_molten_2019}\\
+        \hline
+        \SerpentTWO & Depletion code & Continuous & \cite{aufiero_extended_2013}\\
+        \hline
+        \SaltProc & Interface code & Component-based batch-wise & \cite{rykhlevskii_saltproc_2018}\\
+        \hline
+    \end{tabulary}
+\end{table}
+
+
+\SaltProc\cite{rykhlevskii_saltproc_2018}, the subject of this paper, is an open
+source tool for simulating reactor physics in \Gls{msr}s that uses a batch-wise
+reprocessing approach to model the fuel composition evolution. \SaltProc uses
+\SerpentTWO\cite{leppanen_serpent_2014} to run depletion simulations.
+While other software with comparable capabilities exist (see Table
+\ref{tab:msr_depletion_tools}), \SaltProc is uniqe among its peers as an open
+source project.
 
 %Historically, software used in licensing, \gls{rnd}, and \gls{ent} efforts in
 %the nuclear field have been closed source and proprietary. For \Gls{rnd} and
@@ -248,29 +274,53 @@ and uses \SerpentTWO\cite{leppanen_serpent_2014} to run depletion simulations.
 %and tools required may be more readily implementable and usable in open source projects than
 %in closed codes.
 
-We are entering the era of \gls{oss} purpose-built for nuclear
-science and engineering applications. The number of open source projects in this
-field
-(\ONIX\cite{de_troullioud_de_lanversin_onix_2021}, \OpenMC,
-\NJOYTWOONE\cite{noauthor_njoy21_2022}, \Cyclus\cite{noauthor_cyclus_2022}, to
-name a few) is growing in recognition of the need for distributable,
-high-quality, and transparent software tools. The \Gls{iaea} facilitated
-\Gls{oncore} initiative \cite{fiorina_initiative_2021} is the best
-example of the push towards \Gls{oss}, as seen in the mission statement: to
-``[promote] development and application of open-source multi-physics simulation
-tools to support research, education, and training for analysis of advanced
-nuclear power reactors'' \cite{iaea_open-source_2022}. 
+%We are entering the era of \gls{oss} purpose-built for nuclear
+%science and engineering applications. The number of open source projects in this
+%field
+%(\ONIX\cite{de_troullioud_de_lanversin_onix_2021}, \OpenMC,
+%\NJOYTWOONE\cite{noauthor_njoy21_2022}, \Cyclus\cite{noauthor_cyclus_2022}, to
+%name a few) is growing in recognition of the need for distributable,
+%high-quality, and transparent software tools. The \Gls{iaea} facilitated
+%\Gls{oncore} initiative \cite{fiorina_initiative_2021} is the best
+%example of the push towards \Gls{oss}, as seen in the mission statement: to
+%``[promote] development and application of open-source multi-physics simulation
+%tools to support research, education, and training for analysis of advanced
+%nuclear power reactors'' \cite{iaea_open-source_2022}. 
 
-I am working on implenting support for OpenMC's depletion solver in SaltProc,
+I am working on implenting support for \OpenMC's depletion solver in SaltProc,
 and will verify my implementation on a model of the MSBR.
 
 \section{MOLTEN SALT REACTOR MODEL}
 \label{sec:msr-model}
 
+The \OpenMC \Gls{msbr} model is a reproduction of the on the \SerpentTWO \Gls{msbr} model in \cite{rykhlevskii_modeling_2019}, which in turn is based on
+the specifications of the MSBR design report \cite{robertson_conceptual_1971}.
+The MSBR geometry is extremely complicated, and as such the model presented here
+is a simplified version from the one in the paper. These differences can be seen in Figures \ref{fig:msbr_openmc_model} and \ref{fig:msbr_original_detail}.
 
-\section{CONCLUSIONS}
+\begin{figure}[htpb]
+    \centering
+    \subfloat[][]{
+        \includegraphics[width=0.25\linewidth]{figs/msbr_model_section.png}
+        \label{fig:msbr_openmc_model}
+    }
+    \subfloat[][]{
+        \includegraphics[width=0.25\linewidth]{figs/msbr_original_section.png}
+        \label{fig:msbr_original_detail}
+    }
+    \caption[\Gls{msbr} model comparison]{\subref{fig:msbr_openmc_model} Detail
+    of the OpenMC \Gls{msbr} model; \subref{fig:msbr_original_detail} Detail of
+    the \Gls{msbr} design in the original paper}
+\end{figure}
 
-Present the summary and conclusions here.
+
+\section{CURRENT AND ONGOING WORK}
+
+The \OpenMC MSBR model has been verified against the \SerpentTWO model in both
+a neutron transport simulation, and a depletion simulation.
+
+I currently working on finishing implementation of \OpenMC support in \SaltProc
+so I can test the model in the intended application.
 
 %\section*{NOMENCLATURE}
 %
