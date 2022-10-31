@@ -66,24 +66,23 @@
 %
 % Define title...
 %
-\title{Implementation and Validation of OpenMC \\
-in a Salt Reprocessing Simulator for Molten Salt Reactors}
+\title{Implementation and Validation of OpenMC in SaltProc,\\
+a Salt Reprocessing Simulator for Molten Salt Reactors}
 %
 % ...and authors
 %
 \author{%
   % FIRST AUTHORS 
   %
-  \textbf{O.~Yardas$^1$}\vspace{3pt} \\
-  $^1$University of Illinois Urbana-Champaign 1  \\
-  Corresponding Address \vspace{6pt}\\ 
-  \url{oyardas2@illinois.edu}
+  \textbf{O.~Yardas$^1$, M.~Munk$^1$}\vspace{3pt} \\
+  $^1$University of Illinois Urbana-Champaign  \\
+  \url{oyardas2@illinois.edu}, \url{mmunk2@illinois.edu}
 }
 %
 % Insert authors' names and short version of title in lines below
 %
-\newcommand{\authorHead}{O. Yardas}
-\newcommand{\shortTitle}{OpenMC salt reprocessing simulator}
+\newcommand{\authorHead}{O. Yardas, M. Munk}
+\newcommand{\shortTitle}{OpenMC in SaltProc}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -102,24 +101,21 @@ in a Salt Reprocessing Simulator for Molten Salt Reactors}
 %  Transitioning to electricity production methods that have no \Gls{ghg}
 %  emissions would contribute significantly to global \Gls{ghg} emission
 %  reduction.
-  Like their contemporary counterparts, next generation nuclear
-  reactors will produce no \Gls{ghg} emissions, while being safer and more
-  efficient. \Gls{msr} technology is of particular interest due to the
-  opportunities and challenges it presents. No operating \Gls{msr}s exist, so we
-  must rely on computer simulations to study this technology. Popular \Gls{msr}
-  designs to use in simulations include the \Gls{msbr}, the \Gls{msre}, and the
-  \Gls{msfr}. A key process to consider for \Gls{msr}s is on-line fuel
+  No operating \Gls{msr}s exist, so we must rely on computer simulations and historical references
+  to study this technology. A key process to consider for \Gls{msr} modeling is on-line fuel
   reprocessing and its effect on reactor dynamics. SaltProc is an open source
   interface code tool that simulates on-line fuel reprocessing when coupled with
   a depletion-capable transport solver. SaltProc was intended to be usable with
-  any depletion solver, but only had support for Serpent2. I overhauled the
+  any depletion solver, but was originally built with support for Serpent2. 
+  In this paper, I will present how I overhauled the
   SaltProc code to simplify coupling supports for depletion solvers, and added
-  support for OpenMC. I also validated the new functionality on a full-core model
+  support for OpenMC. I will also present validation results of new functionality on a full-core model
   of the \Gls{msbr}. This is significant as this makes SaltProc the first
-  completely open-source tool to simulate on-line fuel reprocessing.
+  completely open-source tool to simulate on-line fuel reprocessing, as well as demonstrates OpenMC's
+  ability to perform transport-coupled depletion in \Gls{msr}s.
 \end{abstract}
 \vspace{6pt}
-\keywords{MSR, reprocessing, OpenMC}
+\keywords{MSR, online reprocessing, OpenMC}
 
 \section{INTRODUCTION} 
 %Nuclear power currently constitutes one fifth of US domestic electricity
@@ -144,31 +140,17 @@ in a Salt Reprocessing Simulator for Molten Salt Reactors}
  
 %\subsection{Molten Salt Reactors}%
 %\label{sec:molten_salt_reactors}
-The next generation of nuclear power reactors will need to rapidly respond to
-increasing electricity consumption and the need for decarbonization. These
-reactiors need to be built quickly and have widespread use, while maintaining or
-increasing fuel efficiency, economic competitiveness, safety, and proliferation
-resistance.
+\Gls{msr}s are a type of advanced reactor that use a mixture of liquid-phase salts
+as a coolant and solvent for the fuel. \Gls{msr}s are of particular interest due
+to the unique challenges and opportunities they present for new nuclear fuel
+cycles, proliferation safeguards, and multiphysics modeling.
 
-This is the conclusion that the \Gls{gif} came to in their 2002
-roadmap \cite{doe-ne_technology_2002}. \Gls{gif} selected six reactor
-technologies in total. One of them, the \Gls{msr},\footnote{for
-this paper {\it Molten Salt Reactor} refers specifically to the reactor type
-where the fissile material is dissolved in in the salt coolant} is of
-particular interest due to the unique challenges and opportunities it presents
-for new nuclear fuel cycles, proliferation safeguards, and multiphysics
-modeling.
-%% why the msr??
-
-The \Gls{msr} uses a mixture of liquid-phase salts as a coolant and solvent for
-the fuel. Liquid fuel enables the adoption of {\it online reprocessing} by
+Liquid fuel enables the adoption of online reprocessing by
 pumping used fuel out of the reactor and pumping fresh or reprocessed fuel back
 into the reactor.\footnote{this concept is known as {\it separations and feeds}}
 This enables the removal of undesirable fission products produced by the fission
-reaction. In contrast, the fission
-products remain trapped in solid fuel used in contemporary rectors, which can
-reduce the thermal performance of the fuel via thermal cracking as well as
-absorb neutrons that would otherwise contribute to the fission reaction. 
+reaction.
+
 
 %\Gls{msr}s face several technical and logistical challenges before we can
 %deploy them for civilian power generation. High temperature liquid-phase salt
@@ -179,51 +161,61 @@ absorb neutrons that would otherwise contribute to the fission reaction.
 %be necessary in some or all instances. Even with such challenges, I believe the
 %potential benefits of \Gls{msr} technology merit its development.
 
-\Gls{mns} codes will play a critical role in licensing GenIV reactors. In
-preparation for \Gls{msr}s, both the \Gls{doene} and the \Gls{nrc}
-identified several technical gaps in current \Gls{mns} tools that are necessary
-for efficient and effective license application reviews
-\cite{betzler_modeling_2019} \cite{usnrc_nonlwr_2020-1}. In particular, both the
-\Gls{doene} and the \Gls{nrc} have identified fuel composition and its
+
+No currently operating \Gls{msr}s exist, so \gls{mns} codes will play a
+critical role in studying their behavior. In preparation for \Gls{msr}s,
+both the \Gls{doene} and the \Gls{nrc} identified several technical gaps
+in current \Gls{mns} tools that are necessary for efficient and effective
+license application reviews. In particular, both the
+\Gls{doene}\cite{betzler_modeling_2019} and the
+\Gls{nrc}\cite{usnrc_nonlwr_2020-1} have identified fuel composition and its
 evolution in a \Gls{msr} to be key modeling features necessary for accident
 analysis. 
 
 \subsection{\Gls{msr} Depletion Codes}%
 \label{sec:msr_codes}
 
-To model the changing fuel composition in a \Gls{msr}, there are at least two
-processes we must consider:
+To model the changing fuel composition in a \Gls{msr}, two
+processes must be considered:
 \begin{enumerate}
-    \item Fuel {\it depletion}\footnote{the consumption of fissile material in the fuel and production of fission products via the fission chain reaction}
+    \item Fuel depletion
     \item Removal and feed processes
 \end{enumerate}
 
-We can concisely describte the rate of change of the number density of $n$ nuclides with the equation:
-\begin{align}
+We can concisely describe the rate of change of the number density of $n$ nuclides with the equation:
+\begin{equation}
     \label{eq:bateman-1}
-    \frac{d}{dt}N(t) = \mathbf{A}N(t)
-\end{align}
+    \frac{d}{dt}\vec{N}(t) = \mathbf{A}\vec{N}(t)
+\end{equation}
 
-where $N$ is a $n$-vector and $\mathbf{A}$ is the depletion matrix\footnote{this
-matrix contains all the coefficient terms in the Bateman equation}.
-Incorporating removals and feeds into equation \ref{eq:bateman-1} involves
-the addition of a time dependent removal factor $r_{i}(t)$ and feed factor
-$f_{i}(t)$ for each nuclide $i$, which in matrix form we express as:
-\begin{align}
-    \label{eq:bateman-1}
-    \frac{d}{dt}N(t) = \mathbf{A}N(t) + S(t)
-\end{align}
+where $\vec{N}$ is a vector containing the nuclide density for $n$ nuclides, and
+$\mathbf{A}$ is the depletion matrix\footnote{this matrix contains all the
+coefficient terms in the Bateman equation}. Incorporating removals and feeds
+into equation \ref{eq:bateman-1} involves the addition of a time dependent
+removal factor $r_{i}(t)$ and feed factor $f_{i}(t)$ for each nuclide $i$, which
+in matrix form we express as:
+\begin{equation}
+    \label{eq:bateman-2}
+    \frac{d}{dt}\vec{N}(t) = \mathbf{A}\vec{N}(t) + \vec{S}(t)
+\end{equation}
 
 where $S$ is an $n$-vector containing the sums of the removal and feed terms
-for each nuclide $i$. This equation describes {\it continuous reprocessing}.
-The additional term in equation from continuous reprocessing increases
-computational cost and implementation difficulty and may require a different set
-of preconditioners for numerical stability and convergence.
+for each nuclide $i$:
+\begin{equation}
+    \label{eq:s}
+s_{i}(t) = r_{i}(t) + f_{i}(t) \quad \text{for } i\in[1,n]
+\end{equation}
 
-Alternatively, one could run a depletion simulation, perform the removals and
-feeds in an external application on the resulting material composition, and run
+Equation \ref{eq:bateman-2} describes continuous reprocessing.
+The additional term in Equation \ref{eq:bateman-2} from continuous reprocessing
+may be numerically unstable and require costly computational solvers or
+preconditioners.
+
+Alternatively, one could discretize depletion over time. That is,
+run a depletion simulation, perform the removals and feeds in an
+external application on the resulting material composition, and run
 another depletion simulation on the reprocessed composition. This procedure
-models {\it batch-wise reprocessing}, in which material from the core is
+models batch-wise reprocessing, in which material from the core is
 reprocessed at regular intervals rather than continuously. Batch-wise
 reprocessing enables flexibility in the choice of depletion solver, as an
 external software tool can perform the reprocessing step and feed the results
@@ -250,12 +242,16 @@ back into the depletion solver.
 
 
 \SaltProc\cite{rykhlevskii_saltproc_2018}, the subject of this paper, is an open
-source tool for simulating reactor physics in \Gls{msr}s that uses a batch-wise
-reprocessing approach to model the fuel composition evolution. \SaltProc uses
+source tool for simulating depletion with removals and feeds in \Gls{msr}s
+using a batch-wise reprocessing approach. \SaltProc currently uses
 \SerpentTWO\cite{leppanen_serpent_2014} to run depletion simulations.
 While other software with comparable capabilities exist (see Table
-\ref{tab:msr_depletion_tools}), \SaltProc is uniqe among its peers as an open
-source project.
+\ref{tab:msr_depletion_tools}), \SaltProc is unique among its peers as an open
+source interface code. As an interface code, \SaltProc can be used (in theory)
+with whatever depletion-capable transport solver the user already has access to.
+As an open source project, \SaltProc leverages the expertise of the community
+in its development process and lowers the barrier of entry for students and 
+researchers to use the code.
 
 %Historically, software used in licensing, \gls{rnd}, and \gls{ent} efforts in
 %the nuclear field have been closed source and proprietary. For \Gls{rnd} and
@@ -287,47 +283,56 @@ source project.
 %tools to support research, education, and training for analysis of advanced
 %nuclear power reactors'' \cite{iaea_open-source_2022}. 
 
-I am working on implenting support for \OpenMC's depletion solver in SaltProc,
-and will verify my implementation on a model of the MSBR.
+I am working on implementing support for \OpenMC's depletion solver in SaltProc,
+and will verify my implementation on a model of the \Gls{msbr}. This will 
+demonstrate \OpenMC's capability to perform depletion on \Gls{msr}s, as well
+as make \SaltProc usable by the community in general for research and
+education.
 
 \section{MOLTEN SALT REACTOR MODEL}
 \label{sec:msr-model}
 
-The \OpenMC \Gls{msbr} model is a reproduction of the on the \SerpentTWO \Gls{msbr} model in \cite{rykhlevskii_modeling_2019}, which in turn is based on
+The \OpenMC \Gls{msbr} model is a reproduction of the on the \SerpentTWO
+\Gls{msbr} model in \cite{rykhlevskii_modeling_2019}, which in turn is based on
 the specifications of the MSBR design report \cite{robertson_conceptual_1971}.
-The MSBR geometry is extremely complicated, and as such the model presented here
-is a simplified version from the one in the paper. These differences can be seen in Figures \ref{fig:msbr_openmc_model} and \ref{fig:msbr_original_detail}.
+The MSBR geometry is highly complex, and as such the model presented here
+is a simplified version from the one in the paper. Some differences may be
+observed in Figure \ref{fig:msbr}.
 
 \begin{figure}[htpb]
     \centering
-    \subfloat[][]{
+    \subfloat{
         \includegraphics[width=0.25\linewidth]{figs/msbr_model_section.png}
-        \label{fig:msbr_openmc_model}
-    }
-    \subfloat[][]{
+        \label{fig:msbr_openmc_model}}
+    \qquad
+    \subfloat{
         \includegraphics[width=0.25\linewidth]{figs/msbr_original_section.png}
-        \label{fig:msbr_original_detail}
-    }
-    \caption[\Gls{msbr} model comparison]{\subref{fig:msbr_openmc_model} Detail
-    of the OpenMC \Gls{msbr} model; \subref{fig:msbr_original_detail} Detail of
-    the \Gls{msbr} design in the original paper}
+        \label{fig:msbr_original_detail}}
+    \caption[\Gls{msbr} model comparison]{(Left) Detail
+    of the OpenMC \Gls{msbr} model. Yellow is fuel salt, purple is graphite,
+    and blue is Hastelloy-N; (Right): Detail of
+the \Gls{msbr} design from \cite{robertson_conceptual_1971}}
+    \label{fig:msbr}
 \end{figure}
 
 
 \section{CURRENT AND ONGOING WORK}
 
-The \OpenMC MSBR model has been verified against the \SerpentTWO model in both
-a neutron transport simulation, and a depletion simulation.
+I have preliminarily verified the \OpenMC MSBR model against the \SerpentTWO
+model in both a neutron transport simulation, and a depletion simulation.
 
-I currently working on finishing implementation of \OpenMC support in \SaltProc
-so I can test the model in the intended application.
+I am currently working on finishing implementation of \OpenMC support in
+\SaltProc. In the full paper, I will present and compare results for depletion
+with and without online reprocessing between \OpenMC coupled and \SerpentTWO
+coupled \SaltProc. This will be accompanied by a discussion of the differences
+in modeling depletion with each transport code.
 
 %\section*{NOMENCLATURE}
 %
 %If variables are extensively used in the text, a Nomenclature section would be helpful to the readers.
 
 \section*{ACKNOWLEDGEMENTS}
-I would like to acklowledge Dr. Madicken Munk for her review of this manuscript.
+I would like to acknowledge Dr. Madicken Munk for her assistance in this work.
 This work was funded by the NRC Integrated University Grant Program Fellowship.
 
 % You can enter a bibliography into the document using either BibTex with the bibliography
